@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>様子見コスト・住み替え出口シート｜ViVi不動産</title>
+<style>
+:root{
+  --navy:#1E2A4A; --navy2:#2E3D63; --orange:#F28C28; --orange-l:#FDEBD8;
+  --red:#C62828; --bg:#EEF1F6; --line:#C9D2E3; --text:#1F2937; --gray:#5B6475; --white:#fff;
+  --font:"BIZ UDPGothic","BIZ UDPゴシック","Meiryo","メイリオ",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:var(--font);color:var(--text);background:var(--bg);font-size:17px;line-height:1.6}
+header.top{background:var(--navy);color:#fff;padding:14px 24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+header.top h1{font-size:24px;margin:0;font-weight:700}
+header.top .co{color:var(--orange);font-weight:700;font-size:16px}
+nav.tabs{display:flex;gap:6px;margin-left:auto}
+nav.tabs button{font-family:var(--font);font-size:17px;font-weight:700;padding:8px 20px;border-radius:8px;border:2px solid #fff;background:transparent;color:#fff;cursor:pointer}
+nav.tabs button.on{background:#fff;color:var(--navy)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+
+main{display:grid;grid-template-columns:minmax(380px,460px) 1fr;gap:24px;padding:24px;max-width:1500px;margin:0 auto}
+@media (max-width:1000px){main{grid-template-columns:1fr}}
+
+/* 入力パネル */
+.panel{background:#fff;border-radius:12px;padding:20px 22px;align-self:start}
+.panel h2{font-size:20px;color:var(--navy);margin:18px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+.panel h2:first-child{margin-top:0}
+.panel h2 small{font-size:14px;color:var(--gray);font-weight:400;margin-left:6px}
+.f{display:grid;grid-template-columns:1fr 150px;align-items:center;gap:6px 10px;margin:8px 0}
+.f label{font-size:16px;font-weight:700}
+.f .src{grid-column:1 / -1;font-size:14px;color:var(--gray);margin-top:-4px}
+.f .u{display:flex;align-items:center;gap:6px}
+.f input,.f select{width:100%;font-family:var(--font);font-size:18px;padding:7px 8px;border:2px solid var(--line);border-radius:6px;text-align:right}
+.f input[type=text],.f input[type=date]{text-align:left}
+.f.wide{grid-template-columns:1fr}
+.f.txt{grid-template-columns:130px 1fr}
+.f .u span{font-size:15px;white-space:nowrap;color:var(--gray)}
+.range{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.chk{display:flex;gap:18px;flex-wrap:wrap;font-size:16px;font-weight:700;margin:6px 0}
+.chk input{width:20px;height:20px;vertical-align:-4px;margin-right:6px}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.btn{font-family:var(--font);font-size:18px;font-weight:700;padding:12px 22px;border-radius:8px;border:none;cursor:pointer}
+.btn.print{background:var(--orange);color:#fff;flex:1 1 100%}
+.btn.clear{background:#fff;color:var(--gray);border:2px solid var(--line)}
+.hint{background:var(--orange-l);border-radius:8px;padding:10px 12px;font-size:15px;margin-top:12px}
+
+/* お客様用シート（A4） */
+.sheetwrap{overflow-x:auto}
+#sheet{width:210mm;min-height:297mm;background:#fff;margin:0 auto;padding:11mm 12mm;box-shadow:0 2px 10px rgba(30,42,74,.18);font-size:12.5pt;line-height:1.45}
+.s-head{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid var(--navy);padding-bottom:2.5mm;margin-bottom:4mm}
+.s-head .name{font-size:13pt;color:var(--gray)}
+.s-head .name b{font-size:19pt;color:var(--navy)}
+.s-head h2{font-size:21pt;margin:1mm 0 0;color:var(--navy);line-height:1.3}
+.s-head .meta{text-align:right;font-size:11pt;color:var(--gray)}
+.s-head .meta .logo{font-size:15pt;font-weight:700;color:var(--navy)}
+.sec{margin-bottom:4.5mm}
+.sec h3{font-size:15.5pt;margin:0 0 3mm;color:#fff;background:var(--navy);padding:2mm 4mm;border-radius:3mm}
+.big{display:flex;align-items:center;gap:5mm;background:var(--orange-l);border-radius:3mm;padding:3mm 5mm;margin-bottom:3mm}
+.big .lab{font-size:13pt;font-weight:700;flex:1}
+.big .num{font-size:28pt;font-weight:700;color:var(--red);white-space:nowrap}
+.big .num small{font-size:15pt}
+table.t{width:100%;border-collapse:collapse;font-size:12pt}
+table.t th,table.t td{border:1px solid var(--line);padding:1.4mm 3mm;vertical-align:middle}
+table.t th{background:#E3E8F2;color:var(--navy);text-align:left;font-weight:700}
+table.t td.n{text-align:right;font-weight:700;white-space:nowrap;font-size:13.5pt}
+table.t tr.total td{background:var(--orange-l);color:var(--red);font-size:16pt}
+table.t .sub{font-size:10.5pt;color:var(--gray);font-weight:400;display:block}
+.bar{display:flex;height:9mm;border-radius:2mm;overflow:hidden;margin:3mm 0 1mm;background:#EEF1F6}
+.bar div{display:flex;align-items:center;justify-content:center;color:#fff;font-size:10.5pt;font-weight:700;white-space:nowrap;overflow:hidden}
+.bar .a{background:var(--navy)}.bar .b{background:var(--navy2)}.bar .c{background:var(--orange)}
+.msg{font-size:12pt;margin:2.5mm 0 0;padding:2.5mm 4mm;border-left:0;background:#F6F8FB;border-radius:2mm}
+.msg b{color:var(--red)}
+.note{font-size:10pt;color:var(--gray);line-height:1.5;margin-top:4mm;border-top:1px solid var(--line);padding-top:3mm}
+.foot{display:flex;justify-content:space-between;font-size:10.5pt;color:var(--navy);margin-top:3mm;font-weight:700}
+.empty{color:#9AA3B5;font-weight:400}
+
+/* 使い方 */
+#manual{display:none;max-width:980px;margin:24px auto;padding:0 24px 40px}
+#manual section{background:#fff;border-radius:12px;padding:20px 26px;margin-bottom:18px}
+#manual h2{font-size:22px;color:var(--navy);margin:0 0 10px}
+#manual h3{font-size:19px;color:var(--navy);margin:16px 0 6px}
+#manual p,#manual li{font-size:17px}
+#manual .app{display:inline-block;background:var(--navy);color:#fff;font-size:14px;font-weight:700;padding:1px 10px;border-radius:20px;margin-right:6px;vertical-align:2px}
+#manual .why{color:var(--gray);font-size:16px;display:block;margin-top:2px}
+#manual ol>li{margin-bottom:10px}
+#manual .warn{background:var(--orange-l);border-radius:8px;padding:12px 16px}
+
+@media print{
+  @page{size:A4 portrait;margin:6mm}
+  body{background:#fff}
+  header.top,.panel,#manual{display:none!important}
+  main{display:block;padding:0;margin:0;max-width:none}
+  #sheet{box-shadow:none;margin:0;width:198mm;min-height:auto;padding:6mm 7mm}
+  .sheetwrap{overflow:visible}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div><div class="co">ViVi不動産 社内ツール</div><h1>様子見コスト・住み替え出口シート</h1></div>
+  <nav class="tabs">
+    <button id="tabTool" class="on" onclick="showTab('tool')">シートを作る</button>
+    <button id="tabMan" onclick="showTab('man')">使い方</button>
+  </nav>
+</header>
+
+<main id="tool">
+  <div class="panel">
+    <h2>お客様の情報</h2>
+    <div class="f txt"><label for="cname">お客様のお名前</label><input type="text" id="cname" placeholder="例：富山 太郎"></div>
+    <div class="f txt"><label for="pname">物件名</label><input type="text" id="pname" placeholder="例：〇〇マンション"></div>
+    <div class="f txt"><label for="staff">担当者</label><input type="text" id="staff" placeholder="例：西島"></div>
+    <div class="f txt"><label for="date">作成日</label><input type="date" id="date"></div>
+
+    <h2>ローンの条件<small>両方のシートで使います</small></h2>
+    <div class="f"><label for="loan">借入額</label><div class="u"><input type="number" id="loan" min="0" step="10" placeholder="2500"><span>万円</span></div>
+      <div class="src">出どころ：諸費用・資金計画書ツール</div></div>
+    <div class="f"><label for="rate">今の金利</label><div class="u"><input type="number" id="rate" min="0" step="0.001" placeholder="0.775"><span>%</span></div>
+      <div class="src">出どころ：資金計画シミュレーター（今月の金利表）</div></div>
+    <div class="f"><label for="years">返済期間</label><div class="u"><input type="number" id="years" min="1" max="50" value="35"><span>年</span></div></div>
+
+    <h2>様子見コスト<small>相場待ちのお客様用</small></h2>
+    <div class="f"><label for="rent">今の家賃（月額）</label><div class="u"><input type="number" id="rent" min="0" step="1000" placeholder="75000"><span>円</span></div>
+      <div class="src">出どころ：Zoho CRM（空欄なら事前にお客様に確認）</div></div>
+    <div class="f"><label for="wait">様子見する期間</label><div class="u"><input type="number" id="wait" min="1" max="120" value="24"><span>か月</span></div></div>
+    <div class="f"><label for="up">金利の上昇幅（仮定）</label><div class="u"><input type="number" id="up" min="0" step="0.05" value="0.5"><span>%</span></div></div>
+    <div class="f"><label for="reno">今回のリノベ工事費</label><div class="u"><input type="number" id="reno" min="0" step="10" placeholder="800"><span>万円</span></div>
+      <div class="src">出どころ：フルリノベ見積／水まわり見積</div></div>
+    <div class="f"><label for="renoUp">工事費の年間上昇率</label><div class="u"><input type="number" id="renoUp" min="0" step="0.5" placeholder="5"><span>%</span></div>
+      <div class="src">出どころ：工務に聞いた実例（わからなければ0のまま）</div></div>
+
+    <h2>住み替え出口<small>失敗が怖いお客様用</small></h2>
+    <div class="f"><label for="age">物件の今の築年数</label><div class="u"><input type="number" id="age" min="0" max="80" placeholder="25"><span>年</span></div></div>
+    <div class="f wide"><label>10年後の売却価格の目安（下限〜上限）</label>
+      <div class="range"><div class="u"><input type="number" id="p10l" min="0" step="10" placeholder="1500"><span>万円</span></div><div class="u"><input type="number" id="p10h" min="0" step="10" placeholder="1900"><span>万円</span></div></div>
+      <div class="src">出どころ：ファネルチャートの成約実績（築年数が「今＋10年」くらいの同エリア物件）</div></div>
+    <div class="f wide"><label>15年後の売却価格の目安（下限〜上限）</label>
+      <div class="range"><div class="u"><input type="number" id="p15l" min="0" step="10" placeholder="1200"><span>万円</span></div><div class="u"><input type="number" id="p15h" min="0" step="10" placeholder="1600"><span>万円</span></div></div>
+      <div class="src">出どころ：ファネルチャートの成約実績（築年数が「今＋15年」くらいの同エリア物件）</div></div>
+    <div class="f"><label for="other">仲介手数料以外の売却経費</label><div class="u"><input type="number" id="other" min="0" step="1" value="0"><span>万円</span></div>
+      <div class="src">抵当権抹消・印紙代など（仲介手数料は自動で計算します）</div></div>
+
+    <h2>印刷するもの</h2>
+    <div class="chk">
+      <label><input type="checkbox" id="useA" checked>様子見コスト</label>
+      <label><input type="checkbox" id="useB" checked>住み替え出口</label>
+    </div>
+    <div class="btns">
+      <button class="btn print" onclick="window.print()">お客様用シートを印刷する</button>
+      <button class="btn clear" onclick="clearAll()">入力をすべて消す</button>
+    </div>
+    <div class="hint" id="hint"></div>
+  </div>
+
+  <div class="sheetwrap"><div id="sheet"></div></div>
+</main>
+
+<div id="manual">
+  <section>
+    <h2>このツールでできること</h2>
+    <p>商談の前日に数字を入れるだけで、お客様にお渡しする<strong>A4のシート</strong>ができます。計算はすべて自動です。営業が電卓で計算する必要はありません。</p>
+    <ul>
+      <li><strong>様子見コスト</strong>：「もう少し待てば下がるかも」と迷うお客様に、待つことにもコストがかかることを数字で見せます。</li>
+      <li><strong>住み替え出口</strong>：「失敗したらどうしよう」と迷うお客様に、10年後・15年後に手放す場合の目安を見せます。</li>
+    </ul>
+    <p class="warn">入力した内容は<strong>保存されません</strong>。画面を閉じると消えます。お客様の個人情報をパソコンに残さないためです。印刷するか、印刷画面で「PDFに保存」を選んで残してください。</p>
+  </section>
+  <section>
+    <h2>使い方（商談の前日）</h2>
+    <ol>
+      <li><span class="app">諸費用・資金計画書ツール</span>借入額を確認します。
+        <span class="why">理由：借入額が両方のシートの計算のもとになるためです。</span></li>
+      <li><span class="app">資金計画シミュレーター</span>今月の金利を確認します。
+        <span class="why">理由：古い金利で作ると、金融機関の数字と食い違って信頼を失うためです。</span></li>
+      <li><span class="app">Zoho CRM</span>お客様の今の家賃を確認します。空欄ならお客様に電話で聞きます。
+        <span class="why">理由：家賃の掛け捨ては、待っている間に確実に出ていくお金で、様子見コストの中心になる数字だからです。</span></li>
+      <li><span class="app">見積ツール＋工務</span>リノベ工事費を確認し、工務に「この1年で工事費が何%くらい上がったか」の実例を聞きます。
+        <span class="why">理由：「高騰しています」だけでは一般論です。自社の実例の数字なら信用されます。わからない場合は0のままにしてください。</span></li>
+      <li><span class="app">ファネルチャート作成ツール</span>成約実績から、築年数が「今＋10年」「今＋15年」くらいの同じエリアの物件の成約価格を見て、下限と上限を決めます。
+        <span class="why">理由：将来の価格は誰にもわかりません。実際の成約データの「幅」で示すのが誠実で、法律上も安全です。</span></li>
+      <li><span class="app">このツール</span>数字を入れ、右側のシートを確認して「お客様用シートを印刷する」を押します。
+        <span class="why">理由：前日に印刷しておけば、商談では「見せるだけ」で話の流れが止まりません。</span></li>
+    </ol>
+  </section>
+  <section>
+    <h2>自動で計算している内容</h2>
+    <ul>
+      <li><strong>毎月の返済額</strong>：元利均等返済・ボーナス払いなし・金利は返済期間中ずっと同じとして計算しています。</li>
+      <li><strong>家賃の掛け捨て</strong>：今の家賃 × 様子見する月数。</li>
+      <li><strong>金利が上がった場合の負担増</strong>：（上がった金利での毎月の返済額 − 今の金利での毎月の返済額）× 返済回数。</li>
+      <li><strong>工事費の値上がり</strong>：工事費 × 年間上昇率 × 様子見する年数。</li>
+      <li><strong>10年後・15年後のローン残高</strong>：今の金利のまま返済した場合の残高。</li>
+      <li><strong>仲介手数料</strong>：（売却価格 × 3% ＋ 6万円）× 1.1（消費税込み）。</li>
+    </ul>
+  </section>
+  <section>
+    <h2>お客様に見せるときの注意</h2>
+    <ol>
+      <li>金利の上昇は<strong>「上がった場合」の仮定</strong>です。シートには「金利が上がらなかった場合」の金額も自動で載ります。必ず両方を伝えてください。
+        <span class="why">理由：不利なケースだけを見せると、煽られていると感じさせてしまうためです。</span></li>
+      <li>売却価格は必ず<strong>幅（下限〜上限）</strong>で伝え、「将来の価格をお約束するものではありません」と添えてください。
+        <span class="why">理由：将来の価格を断定すると、宅建業法の「断定的判断の提供」にあたるおそれがあるためです。</span></li>
+      <li>シートを見せたら、すぐに話さず<strong>10〜20秒待ちます</strong>（クロージング集の「沈黙」の鉄則）。</li>
+    </ol>
+  </section>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const ids = ["cname","pname","staff","date","loan","rate","years","rent","wait","up","reno","renoUp","age","p10l","p10h","p15l","p15h","other","useA","useB"];
+const num = id => { const v = parseFloat($(id).value); return isNaN(v) ? null : v; };
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const man = v => (v === null || !isFinite(v)) ? '<span class="empty">―</span>' : Math.round(v).toLocaleString("ja-JP") + "万円";
+const yen = v => (v === null || !isFinite(v)) ? '<span class="empty">―</span>' : (Math.round(v / 100) * 100).toLocaleString("ja-JP") + "円";
+const pct = v => (+v).toLocaleString("ja-JP", { maximumFractionDigits: 3 }) + "%";
+
+// 元利均等の毎月返済額（円）
+function pmt(loanMan, ratePct, years) {
+  const P = loanMan * 10000, n = years * 12, i = ratePct / 100 / 12;
+  return i === 0 ? P / n : P * i / (1 - Math.pow(1 + i, -n));
+}
+// kか月返済後の残高（万円）
+function balance(loanMan, ratePct, years, k) {
+  const P = loanMan * 10000, i = ratePct / 100 / 12, m = pmt(loanMan, ratePct, years);
+  if (k >= years * 12) return 0;
+  const b = i === 0 ? P - m * k : P * Math.pow(1 + i, k) - m * (Math.pow(1 + i, k) - 1) / i;
+  return Math.max(0, b) / 10000;
+}
+const fee = p => (p * 0.03 + 6) * 1.1; // 仲介手数料（万円・税込）
+
+function render() {
+  const loan = num("loan"), rate = num("rate"), years = num("years"), rent = num("rent"),
+    wait = num("wait"), up = num("up"), reno = num("reno"), renoUp = num("renoUp") ?? 0,
+    age = num("age"), other = num("other") ?? 0;
+  const loanOK = loan !== null && rate !== null && years;
+  const name = $("cname").value.trim(), pn = $("pname").value.trim(), staff = $("staff").value.trim();
+  const d = $("date").value ? new Date($("date").value + "T00:00") : null;
+  const dstr = d ? `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日` : "";
+  const missing = [];
+
+  let html = `<div class="s-head"><div><div class="name"><b>${name ? esc(name) : "　　　　"}</b> 様</div>
+    <h2>住まいの判断材料シート</h2>${pn ? `<div class="name">物件：${esc(pn)}</div>` : ""}</div>
+    <div class="meta"><div class="logo">ViVi不動産</div>${dstr ? `作成日 ${dstr}<br>` : ""}${staff ? `担当 ${esc(staff)}` : ""}</div></div>`;
+
+  // ===== 様子見コスト =====
+  if ($("useA").checked) {
+    const A = (rent !== null && wait) ? rent * wait / 10000 : null;
+    let mNow = null, mUp = null, B = null;
+    if (loanOK && up !== null) { mNow = pmt(loan, rate, years); mUp = pmt(loan, rate + up, years); B = (mUp - mNow) * years * 12 / 10000; }
+    const C = (reno !== null && wait) ? reno * renoUp / 100 * wait / 12 : null;
+    const ok = A !== null && B !== null && C !== null;
+    const T = ok ? A + B + C : null, T2 = ok ? A + C : null;
+    const paid = (loanOK && wait) ? loan - balance(loan, rate, years, wait) : null;
+    if (rent === null) missing.push("今の家賃");
+    if (reno === null) missing.push("リノベ工事費");
+    const wy = wait ? (wait % 12 === 0 ? `${wait / 12}年` : `${wait}か月`) : "　";
+    let bar = "";
+    if (ok && T > 0) {
+      const w = v => Math.max(0, v / T * 100).toFixed(1);
+      bar = `<div class="bar"><div class="a" style="width:${w(A)}%">家賃</div><div class="b" style="width:${w(B)}%">金利</div><div class="c" style="width:${w(C)}%">工事費</div></div>`;
+    }
+    html += `<div class="sec"><h3>「今決める」と「${wy}様子見する」の比較</h3>
+      <div class="big"><div class="lab">${wy}様子見した場合に<br>増える負担の目安</div><div class="num">${ok ? Math.round(T).toLocaleString("ja-JP") + "<small>万円</small>" : '<span class="empty">―</span>'}</div></div>
+      ${bar}
+      <table class="t">
+        <tr><th>家賃の掛け捨て<span class="sub">今の家賃 ${rent !== null ? rent.toLocaleString("ja-JP") + "円" : "―"} × ${wait || "―"}か月</span></th><td class="n">${man(A)}</td></tr>
+        <tr><th>金利が${up !== null ? pct(up) : "―"}上がった場合の負担増<span class="sub">毎月の返済 ${yen(mNow)} → ${yen(mUp)}（月${mNow !== null ? yen(mUp - mNow) : "―"}増）× ${years || "―"}年</span></th><td class="n">${man(B)}</td></tr>
+        <tr><th>リノベ工事費の値上がり<span class="sub">工事費 ${reno !== null ? reno.toLocaleString("ja-JP") + "万円" : "―"} × 年${pct(renoUp)} × ${wait ? (wait / 12).toLocaleString("ja-JP", { maximumFractionDigits: 1 }) : "―"}年</span></th><td class="n">${man(C)}</td></tr>
+        <tr class="total"><td><b>合計</b></td><td class="n">${man(T)}</td></tr>
+      </table>
+      ${ok ? `<p class="msg">物件の価格が<b>${Math.round(T).toLocaleString("ja-JP")}万円以上</b>下がらないと、待った分だけ負担が増える計算です。<br>金利が上がらなかった場合でも、家賃と工事費だけで<b>${Math.round(T2).toLocaleString("ja-JP")}万円</b>の負担になります。${paid !== null ? `<br>また、今決めていれば、この${wy}でローンの残高が<b>${Math.round(paid).toLocaleString("ja-JP")}万円</b>減っています。` : ""}</p>` : ""}
+    </div>`;
+  }
+
+  // ===== 住み替え出口 =====
+  if ($("useB").checked) {
+    const row = (k, lo, hi) => {
+      const bal = loanOK ? balance(loan, rate, years, k * 12) : null;
+      const okp = lo !== null && hi !== null;
+      const fl = okp ? fee(lo) + other : null, fh = okp ? fee(hi) + other : null;
+      const nl = (okp && bal !== null) ? lo - bal - fl : null, nh = (okp && bal !== null) ? hi - bal - fh : null;
+      return { bal, lo, hi, fl, fh, nl, nh, okp };
+    };
+    const r10 = row(10, num("p10l"), num("p10h")), r15 = row(15, num("p15l"), num("p15h"));
+    window._negExit = [r10.nl, r15.nl].some(v => v !== null && v < 0);
+    if (!r10.okp || !r15.okp) missing.push("売却価格の目安");
+    const f0 = v => (Math.round(v) < 0 ? "−" : "") + Math.abs(Math.round(v)).toLocaleString("ja-JP");
+    const rng = (a, b) => (a === null || b === null) ? '<span class="empty">―</span>' : `${f0(a)}〜${f0(b)}万円`;
+    const neg = [r10.nl, r15.nl].some(v => v !== null && v < 0);
+    const ageL = n => age !== null ? `<span class="sub">築${age + n}年のころ</span>` : "";
+    html += `<div class="sec"><h3>10年後・15年後に住み替える場合の目安</h3>
+      <table class="t">
+        <tr><th style="width:38%"></th><th style="text-align:center">10年後${ageL(10)}</th><th style="text-align:center">15年後${ageL(15)}</th></tr>
+        <tr><th>① ローン残高</th><td class="n">${man(r10.bal)}</td><td class="n">${man(r15.bal)}</td></tr>
+        <tr><th>② 売却価格の目安<span class="sub">同じエリア・同じくらいの築年数の成約実績から</span></th><td class="n">${rng(r10.lo, r10.hi)}</td><td class="n">${rng(r15.lo, r15.hi)}</td></tr>
+        <tr><th>③ 売却時の経費の目安<span class="sub">仲介手数料など</span></th><td class="n">${rng(r10.fl, r10.fh)}</td><td class="n">${rng(r15.fl, r15.fh)}</td></tr>
+        <tr class="total"><td><b>手元に残る額の目安</b><span class="sub">② − ① − ③</span></td><td class="n">${rng(r10.nl, r10.nh)}</td><td class="n">${rng(r15.nl, r15.nh)}</td></tr>
+      </table>
+      <p class="msg">中古リノベは、新築と比べて購入時の価格が抑えられるため、将来の住み替えもしやすいのが強みです。売却価格は過去の成約データから見た<b>幅</b>でお示ししています。${neg ? `<br>「−（マイナス）」の場合は、売却時にその分の手元資金が必要になる目安です。繰上返済や自己資金の増額で改善できますので、一緒に計画を考えましょう。` : ""}</p>
+    </div>`;
+  }
+
+  if (!$("useA").checked && !$("useB").checked) html += `<p class="msg">「印刷するもの」を1つ以上選んでください。</p>`;
+  if (!loanOK) missing.unshift("借入額・今の金利・返済期間");
+
+  html += `<div class="note">【試算の条件】${loanOK ? `借入額${loan.toLocaleString("ja-JP")}万円・金利${pct(rate)}・返済期間${years}年・` : ""}元利均等返済、ボーナス払いなし、金利は返済期間中変わらないものとして計算しています。<br>
+    この資料は判断材料としての試算です。将来の金利や売却価格をお約束するものではありません。金利の上昇は「上がった場合」の仮定です。実際のお借入れ条件は金融機関の審査により決まります。</div>
+    <div class="foot"><span>ViVi不動産株式会社　天正寺本店 富山市天正寺1076</span><span>フリーダイヤル 0120-145-151</span></div>`;
+
+  $("sheet").innerHTML = html;
+  const negWarn = ($("useB").checked && window._negExit) ? `<br><br><strong>注意：</strong>手元に残る額がマイナスになる場合があります。隠さずにお客様へ伝え、繰上返済や自己資金の増額などの対策と一緒に説明してください。` : "";
+  window._negExit = false;
+  $("hint").innerHTML = (missing.length ? `まだ入っていない項目：<strong>${[...new Set(missing)].join("、")}</strong><br>入力すると右のシートに自動で計算結果が出ます。` : "すべて入力されています。右のシートを確認して印刷してください。") + negWarn;
+}
+
+function clearAll() {
+  if (!confirm("入力した内容をすべて消します。よろしいですか？")) return;
+  ids.forEach(id => { const el = $(id); if (el.type === "checkbox") el.checked = true; else el.value = ""; });
+  $("years").value = 35; $("wait").value = 24; $("up").value = 0.5; $("other").value = 0; setToday(); render();
+}
+function setToday() { const t = new Date(); $("date").value = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`; }
+function showTab(t) {
+  $("tool").style.display = t === "tool" ? "" : "none";
+  $("manual").style.display = t === "man" ? "block" : "none";
+  $("tabTool").classList.toggle("on", t === "tool"); $("tabMan").classList.toggle("on", t === "man");
+}
+// 印刷するときにA4用紙1枚に収まるよう、必要な分だけ縮小する
+function fitToPage() {
+  const sh = $("sheet"), maxH = 283 * 96 / 25.4; // A4の高さ（余白を除く）
+  sh.style.zoom = 1; sh.style.width = "";
+  for (let k = 0; k < 3; k++) {
+    const h = sh.getBoundingClientRect().height / (parseFloat(sh.style.zoom) || 1);
+    const z = Math.min(1, maxH / h * 0.98);
+    sh.style.zoom = z; sh.style.width = (198 / z) + "mm";
+  }
+}
+function resetFit() { const sh = $("sheet"); sh.style.zoom = ""; sh.style.width = ""; }
+window.addEventListener("beforeprint", fitToPage);
+window.addEventListener("afterprint", resetFit);
+ids.forEach(id => $(id).addEventListener("input", render));
+setToday(); render();
+</script>
+</body>
+</html>
